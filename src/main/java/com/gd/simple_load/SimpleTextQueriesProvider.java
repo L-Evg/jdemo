@@ -2,8 +2,6 @@ package com.gd.simple_load;
 
 import com.gd.util.JaggerPropertiesProvider;
 import com.griddynamics.jagger.invoker.v2.JHttpQuery;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,13 +43,6 @@ public class SimpleTextQueriesProvider implements Iterable {
 
         return queries.iterator();
     }
-
-/*    @Bean
-    public String getPropValue(){
-        String PROP_NAME = "p1.aut.text_amount";
-
-        return getTestPropertyValue(PROP_NAME);
-    }*/
 }
 // end: following section is used for docu generation - Query provider
 

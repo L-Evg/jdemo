@@ -18,7 +18,6 @@ import org.springframework.core.env.Environment;
 @PropertySource("classpath:test.properties")
 public class JaggerPropertiesProvider {
 
-    //TODO: Resolve that NPE for autowired finally! ru.qa.tools Properties?
     @Autowired
     private ApplicationContext jaggerContext;
 

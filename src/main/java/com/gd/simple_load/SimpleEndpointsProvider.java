@@ -22,24 +22,13 @@ public class SimpleEndpointsProvider implements Iterable  {
     // Later distributor will invoke iterator method to get endpoints
     public SimpleEndpointsProvider(JaggerPropertiesProvider provider) {
         JHttpEndpoint httpEndpoint = new JHttpEndpoint(URI.create(provider.getTestPropertyValue("p1.aut.url")));
-        //JHttpEndpoint httpEndpoint = new JHttpEndpoint(URI.create(getAutUrl()));
         endpoints.add(httpEndpoint);
     }
     
     @Override
     public Iterator<JHttpEndpoint> iterator() {
-/*        if (endpoints.isEmpty()) {
-           // JHttpEndpoint httpEndpoint = new JHttpEndpoint(URI.create(getAutUrl()));
-            JHttpEndpoint httpEndpoint = new JHttpEndpoint(URI.create(endpoint));
-            endpoints.add(httpEndpoint);
-        }*/
         return endpoints.iterator();
     }
 
-/*    public String getAutUrl(){
-        //return provider.getTestPropertyValue("p1.aut.url");
-        //return new String (getTestPropertyValue("p1.aut.url"));
-        return getTestPropertyValue("p1.aut.url");
-    }*/
 }
 // end: following section is used for docu generation - Endpoint provider
