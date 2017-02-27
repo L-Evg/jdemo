@@ -141,15 +141,15 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                 .build();
 
         JLimit latencyPercentile42Limit = JLimitVsRefValue.builder(JMetricName.PERF_LATENCY_PERCENTILE(42D), RefValue.of(0.35D))
-                .withOnlyErrors(LowErrThresh.of(0.8), UpErrThresh.of(1.2))
+                .withOnlyErrors(LowErrThresh.of(0.25), UpErrThresh.of(1.75))
                 .build();
 
         JLimit latencyPercentile95Limit = JLimitVsRefValue.builder(JMetricName.PERF_LATENCY_PERCENTILE(95D), RefValue.of(0.99D))
-                .withExactLimits(LowErrThresh.of(0.90), LowWarnThresh.of(0.91), UpWarnThresh.of(1.09), UpErrThresh.of(1.1))
+                .withOnlyErrors(LowErrThresh.of(0.50), UpErrThresh.of(1.50))
                 .build();
 
         JLimit avgLatencyLimit = JLimitVsRefValue.builder(JMetricName.PERF_AVG_LATENCY, RefValue.of(1.1))
-                .withExactLimits(LowErrThresh.of(0.90), LowWarnThresh.of(0.92), UpWarnThresh.of(1.08), UpErrThresh.of(1.10))
+                .withOnlyErrors(LowErrThresh.of(0.50), UpErrThresh.of(1.50))
                 .build();
 
         JLimit successRateLimit = JLimitVsRefValue.builder(JMetricName.PERF_SUCCESS_RATE_OK, RefValue.of(1D))
