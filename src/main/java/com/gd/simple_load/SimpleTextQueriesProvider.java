@@ -23,10 +23,14 @@ import java.util.Random;
  */
 // begin: following section is used for docu generation - Query provider
 public class SimpleTextQueriesProvider implements Iterable {
-    private String propValue;
+    private Integer propValue;
+    private boolean isExtraLoadMode = false; //TODO: Re-factor, avoid duplicates.
+    private int extraLoadCoef;
 
     public SimpleTextQueriesProvider(JaggerPropertiesProvider provider) {
-        this.propValue = provider.getTestPropertyValue("p1.aut.text_amount");
+        this.propValue = Integer.valueOf(provider.getTestPropertyValue("p1.aut.text_amount"));
+        this.isExtraLoadMode = Boolean.valueOf(provider.getTestPropertyValue("load.extra"));
+        this.extraLoadCoef = Integer.valueOf(provider.getTestPropertyValue("load.extra.coef"));
     }
 
     @Override
@@ -34,14 +38,22 @@ public class SimpleTextQueriesProvider implements Iterable {
         List<JHttpQuery> queries = new ArrayList<>();
         queries.add(new JHttpQuery()
                 .get()
-                .path(propValue));
+                .path(getValue().toString()));
 
         queries.add(new JHttpQuery()
                 .get()
                 .responseBodyType(String.class)
-                .path(Integer.toString(50 + new Random().nextInt(Integer.valueOf(propValue)))));
+                .path(Integer.toString(50 + new Random().nextInt(getValue()))));
 
         return queries.iterator();
+    }
+
+    private Integer getValue(){
+        if (isExtraLoadMode) {
+            return propValue * extraLoadCoef;
+        }
+
+        return propValue;
     }
 }
 // end: following section is used for docu generation - Query provider

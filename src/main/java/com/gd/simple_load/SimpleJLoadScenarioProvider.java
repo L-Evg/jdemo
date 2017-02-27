@@ -42,15 +42,15 @@ public class SimpleJLoadScenarioProvider extends JaggerPropertiesProvider {
         @Bean
         public JLoadScenario simpleJaggerLoadScenario() {
             // Example of using JaggerPropertiesProvider
-            Long iterationsNumber = Long.valueOf(getTestPropertyValue("p1.load.scenario.termination.iterations"));
+            Long iterationsNumber = Long.valueOf(getAdjustedIntValue("p1.load.scenario.termination.iterations"));
             Long maxDurationInSeconds = Long.valueOf(getTestPropertyValue("p1.load.scenario.termination.max.duration.seconds"));
 
             JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations
                     .of(IterationsNumber.of(iterationsNumber), MaxDurationInSeconds.of(maxDurationInSeconds));
 
             JLoadProfile jLoadProfileRps = JLoadProfileRps
-                    .builder(RequestsPerSecond.of(Long.valueOf(getTestPropertyValue("p1.load.scenario.profile.rps"))))
-                    .withMaxLoadThreads(Long.valueOf(getTestPropertyValue("p1.load.scenario.profile.max_threads")))
+                    .builder(RequestsPerSecond.of(Long.valueOf(getAdjustedIntValue("p1.load.scenario.profile.rps"))))
+                    .withMaxLoadThreads(Long.valueOf(getAdjustedIntValue("p1.load.scenario.profile.max_threads")))
                     .withWarmUpTimeInMilliseconds(Long.valueOf(getTestPropertyValue("p1.load.scenario.profile.warmUpTime")))
                     .build();
 
@@ -125,4 +125,19 @@ public class SimpleJLoadScenarioProvider extends JaggerPropertiesProvider {
                     .build();
         }
         // end: following section is used for docu generation - Detailed load test scenario configuration
+
+
+    //TODO: Re-factor to avoid duplicates.
+    private Integer getAdjustedIntValue(String propName){
+
+        boolean isExtraLoadMode = Boolean.valueOf(getTestPropertyValue("load.extra"));
+        int extraLoadCoef = Integer.valueOf(getTestPropertyValue("load.extra.coef"));
+        Integer propValue = Integer.valueOf(getTestPropertyValue(propName));
+
+        if (isExtraLoadMode) {
+            return propValue * extraLoadCoef;
+        }
+
+        return propValue;
+    }
 }

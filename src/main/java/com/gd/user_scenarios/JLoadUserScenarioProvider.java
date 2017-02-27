@@ -43,12 +43,12 @@ public class JLoadUserScenarioProvider extends JaggerPropertiesProvider {
                 .build();
 
         JLoadProfile jLoadProfileInvocations = JLoadProfileInvocation.builder(
-                 InvocationCount.of(Integer.valueOf(getTestPropertyValue("p2.load.scenario.profile.iterations"))),
-                 ThreadCount.of(Integer.valueOf(getTestPropertyValue("p2.load.scenario.profile.max_threads"))))
+                 InvocationCount.of(getAdjustedIntValue("p2.load.scenario.profile.iterations")),
+                 ThreadCount.of(getAdjustedIntValue("p2.load.scenario.profile.max_threads")))
                 .build();
 
         JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations.of(
-                IterationsNumber.of(Integer.valueOf(getTestPropertyValue("p2.load.scenario.termination.iterations"))),
+                IterationsNumber.of(getAdjustedIntValue("p2.load.scenario.termination.iterations")),
                 MaxDurationInSeconds.of(Integer.valueOf(getTestPropertyValue("p2.load.scenario.termination.max.duration.seconds"))));
 
         String stepId = generateScenarioStepId(UserScenarioProvider.SCENARIO_ID, UserScenarioProvider.STEP_1_ID, 1);
@@ -64,6 +64,21 @@ public class JLoadUserScenarioProvider extends JaggerPropertiesProvider {
         JParallelTestsGroup jParallelTestsGroup = JParallelTestsGroup.builder(Id.of("ptg_usr_scenarios"), jLoadTest).build();
 
         return JLoadScenario.builder(Id.of("userScenario"), jParallelTestsGroup).build();
+    }
+
+
+    //TODO: Re-factor to avoid duplicates.
+    private Integer getAdjustedIntValue(String propName){
+
+        boolean isExtraLoadMode = Boolean.valueOf(getTestPropertyValue("load.extra"));
+        int extraLoadCoef = Integer.valueOf(getTestPropertyValue("load.extra.coef"));
+        Integer propValue = Integer.valueOf(getTestPropertyValue(propName));
+
+        if (isExtraLoadMode) {
+            return propValue * extraLoadCoef;
+        }
+
+        return propValue;
     }
 }
 
