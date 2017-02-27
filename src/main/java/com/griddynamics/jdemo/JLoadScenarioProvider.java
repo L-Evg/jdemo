@@ -1,5 +1,6 @@
 package com.griddynamics.jdemo;
 
+import com.griddynamics.jagger.user.test.configurations.termination.JTerminationCriteriaBackground;
 import com.griddynamics.util.JaggerPropertiesProvider;
 import com.griddynamics.jagger.engine.e1.collector.loadscenario.ExampleLoadScenarioListener;
 import com.griddynamics.jagger.engine.e1.collector.testgroup.ExampleTestGroupListener;
@@ -48,10 +49,10 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
         public JLoadScenario demoJaggerLoadScenario() {
             JLoadTest jLoadTest_Simple = buildSimpleJaggerLoadTest();
 
-            JLoadTest jLoadTest_UsrScenario = buildUsrScenarioLoadTest();
+            JLoadTest jLoadTest_UserScenario = buildUserScenarioLoadTest();
 
             JParallelTestsGroup jParallelTestsGroup = JParallelTestsGroup
-                    .builder(Id.of("parallelTestsGroup"), jLoadTest_Simple, jLoadTest_UsrScenario)
+                    .builder(Id.of("parallelTestsGroup"), jLoadTest_Simple, jLoadTest_UserScenario)
                     .addListener(new ExampleTestGroupListener())
                     .build();
 
@@ -61,21 +62,23 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                     .build();
         }
 
-    // end: following section is used for docu generation - Detailed load test scenario configuration
 
     private JLoadTest buildSimpleJaggerLoadTest(){
         JTestDefinition jTestDefinition = JTestDefinition.builder(Id.of("td_simple"), new SimpleEndpointsProvider(this))
                                             .withQueryProvider(new SimpleQueriesProvider(this))
                                             .build();
 
-        JLoadProfile jLoadProfileRps = JLoadProfileRps.builder(RequestsPerSecond.of(10)).withMaxLoadThreads(10).withWarmUpTimeInMilliseconds(10000).build();
+        JLoadProfile jLoadProfileRps = JLoadProfileRps.builder(RequestsPerSecond.of(10)).
+                withMaxLoadThreads(10).
+                withWarmUpTimeInMilliseconds(10000).
+                build();
 
-        JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations.of(IterationsNumber.of(500), MaxDurationInSeconds.of(30));
+        JTerminationCriteria jTerminationCriteria = JTerminationCriteriaBackground.getInstance();
 
         return  JLoadTest.builder(Id.of("lt_simple"), jTestDefinition, jLoadProfileRps, jTerminationCriteria).build();
     }
 
-    private JLoadTest buildUsrScenarioLoadTest() {
+    private JLoadTest buildUserScenarioLoadTest() {
 
         JTestDefinition jTestDefinition =
                 JTestDefinition.builder(Id.of("td_user_scenario"), new UserScenarioProvider(this))
@@ -94,11 +97,11 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                         .build();
 
         JLoadProfile jLoadProfileInvocations =
-                JLoadProfileInvocation.builder(InvocationCount.of(getAdjustedIntValue(100)), ThreadCount.of(getAdjustedIntValue(2)))
+                JLoadProfileInvocation.builder(InvocationCount.of(10), ThreadCount.of(1))
                         .build();
 
         JTerminationCriteria jTerminationCriteria =
-                JTerminationCriteriaIterations.of(IterationsNumber.of(getAdjustedIntValue(500)), MaxDurationInSeconds.of(30));
+                JTerminationCriteriaIterations.of(IterationsNumber.of(10), MaxDurationInSeconds.of(60));
 
         // We are setting acceptance criteria for particular metric of the selected step in the scenario
         JLimit avgLatencyLimit =
@@ -135,15 +138,4 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                         .build();
     }
 
-    /**
-     * Increases the value if extra load mode is on.
-     */
-    private Integer getAdjustedIntValue(int value){
-
-        if (getExtraLoadFlag()) {
-            return value * 5;
-        }
-
-        return value;
-    }
 }
