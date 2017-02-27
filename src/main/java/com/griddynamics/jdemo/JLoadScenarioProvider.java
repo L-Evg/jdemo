@@ -101,7 +101,7 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                         .build();
 
         JTerminationCriteria jTerminationCriteria =
-                JTerminationCriteriaIterations.of(IterationsNumber.of(10), MaxDurationInSeconds.of(60));
+                JTerminationCriteriaIterations.of(IterationsNumber.of(10), MaxDurationInSeconds.of(120));
 
         // We are setting acceptance criteria for particular metric of the selected step in the scenario
         JLimit avgLatencyLimit =
