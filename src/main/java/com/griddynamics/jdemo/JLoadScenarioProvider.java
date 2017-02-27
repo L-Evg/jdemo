@@ -68,9 +68,9 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                                             .withQueryProvider(new SimpleQueriesProvider(this))
                                             .build();
 
-        JLoadProfile jLoadProfileRps = JLoadProfileRps.builder(RequestsPerSecond.of(10)).withMaxLoadThreads(10).withWarmUpTimeInMilliseconds(10000).build();
+        JLoadProfile jLoadProfileRps = JLoadProfileRps.builder(RequestsPerSecond.of(getAdjustedIntValue(10))).withMaxLoadThreads(getAdjustedIntValue(10)).withWarmUpTimeInMilliseconds(10000).build();
 
-        JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations.of(IterationsNumber.of(500), MaxDurationInSeconds.of(30));
+        JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations.of(IterationsNumber.of(getAdjustedIntValue(500)), MaxDurationInSeconds.of(30));
 
         return  JLoadTest.builder(Id.of("lt_simple"), jTestDefinition, jLoadProfileRps, jTerminationCriteria).build();
     }
@@ -98,7 +98,7 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                         .build();
 
         JTerminationCriteria jTerminationCriteria =
-                JTerminationCriteriaIterations.of(IterationsNumber.of(getAdjustedIntValue(500)), MaxDurationInSeconds.of(30));
+                JTerminationCriteriaIterations.of(IterationsNumber.of(500), MaxDurationInSeconds.of(30));
 
         // We are setting acceptance criteria for particular metric of the selected step in the scenario
         JLimit avgLatencyLimit =
