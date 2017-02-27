@@ -1,6 +1,6 @@
-package com.gd.simple_load;
+package com.griddynamics.jdemo;
 
-import com.gd.util.JaggerPropertiesProvider;
+import com.griddynamics.util.JaggerPropertiesProvider;
 import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 
 import java.net.URI;
@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * An example of endpoint provider.
- * Provides endpoints for {@link SimpleJLoadScenarioProvider}.
+ * Provides endpoints for {@link JLoadScenarioProvider}.
  */
 // begin: following section is used for docu generation - Endpoint provider
 public class SimpleEndpointsProvider implements Iterable  {

@@ -1,4 +1,4 @@
-package com.gd.util;
+package com.griddynamics.util;
 
 import com.griddynamics.jagger.util.JaggerXmlApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.core.env.Environment;
  * Properties from test.properties do not override properties from environment.properties.
  */
 @Configuration
-//@ComponentScan(basePackages = { "com.gd.*" })
 @PropertySource("classpath:test.properties")
 public class JaggerPropertiesProvider {
 
@@ -29,6 +28,14 @@ public class JaggerPropertiesProvider {
     }
 
     public String getTestPropertyValue(String key) {
-        return new String(testEnv.getRequiredProperty(key));
+        return testEnv.getRequiredProperty(key);
+    }
+
+    public boolean getExtraLoadFlag() {
+        try {
+            return Boolean.valueOf(getTestPropertyValue("load.extra"));
+        } catch (Exception e){
+            return false;
+        }
     }
 }
