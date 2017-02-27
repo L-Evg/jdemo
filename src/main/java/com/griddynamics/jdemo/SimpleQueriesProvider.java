@@ -24,15 +24,15 @@ public class SimpleQueriesProvider implements Iterable {
     public Iterator iterator() {
         List<JHttpQuery> queries = new ArrayList<>();
 
-        final String subPath = "/sleep/pulse/";
+        final String subPath = "/sleep/pulse";
         if (isExtraLoadMode) {
             queries.add(new JHttpQuery()
                     .get()
-                    .path(subPath + "/10000/12000"));
+                    .path(subPath + "/10000/3000"));
         } else {
             queries.add(new JHttpQuery()
                     .get()
-                    .path(subPath + "/20000/6000"));
+                    .path(subPath + "/10000/1000"));
         }
 
         return queries.iterator();
