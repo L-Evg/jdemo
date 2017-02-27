@@ -106,24 +106,20 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
 
         // We are setting acceptance criteria for particular metric of the selected step in the scenario
         JLimit avgLatencyLimit =
-                JLimitVsRefValue.builder(SCENARIO_ID, STEP_1_ID, StandardMetricsNamesUtil.LATENCY_AVG_AGG_ID, RefValue.of(1.2))
+                JLimitVsRefValue.builder(SCENARIO_ID, STEP_1_ID, StandardMetricsNamesUtil.LATENCY_AVG_AGG_ID, RefValue.of(0.015))
                         .withOnlyErrors(LowErrThresh.of(0.25), UpErrThresh.of(2.0))
                         .build();
-        JLimit stdDevLatencyLimit =
-                JLimitVsRefValue.builder(SCENARIO_ID, STEP_1_ID, StandardMetricsNamesUtil.LATENCY_STD_DEV_AGG_ID, RefValue.of(0.5))
-                        .withOnlyErrors(LowErrThresh.of(0.5), UpErrThresh.of(1.5))
-                        .build();
         JLimit maxLatencyLimit =
-                JLimitVsRefValue.builder(SCENARIO_ID, STEP_2_ID, StandardMetricsNamesUtil.LATENCY_MAX_AGG_ID, RefValue.of(2.0))
-                        .withOnlyErrors(LowErrThresh.of(0.5), UpErrThresh.of(1.5))
+                JLimitVsRefValue.builder(SCENARIO_ID, STEP_2_ID, StandardMetricsNamesUtil.LATENCY_MAX_AGG_ID, RefValue.of(0.09))
+                        .withOnlyErrors(LowErrThresh.of(0.25), UpErrThresh.of(1.75))
                         .build();
         JLimit minDevLatencyLimit =
-                JLimitVsRefValue.builder(SCENARIO_ID, STEP_2_ID, StandardMetricsNamesUtil.LATENCY_MIN_AGG_ID, RefValue.of(0.2))
-                        .withOnlyErrors(LowErrThresh.of(0.5), UpErrThresh.of(1.5))
+                JLimitVsRefValue.builder(SCENARIO_ID, STEP_2_ID, StandardMetricsNamesUtil.LATENCY_MIN_AGG_ID, RefValue.of(0.02))
+                        .withOnlyErrors(LowErrThresh.of(0.25), UpErrThresh.of(1.75))
                         .build();
         JLimit percentile99LatencyLimit =
-                JLimitVsRefValue.builder(SCENARIO_ID, STEP_2_ID, JMetricName.PERF_LATENCY_PERCENTILE(99D), RefValue.of(2.0))
-                        .withOnlyErrors(LowErrThresh.of(0.5), UpErrThresh.of(1.5))
+                JLimitVsRefValue.builder(SCENARIO_ID, STEP_2_ID, JMetricName.PERF_LATENCY_PERCENTILE(99D), RefValue.of(0.09))
+                        .withOnlyErrors(LowErrThresh.of(0.25), UpErrThresh.of(1.75))
                         .build();
         JLimit successRateLimit =
                 JLimitVsRefValue.builder(SCENARIO_ID, STEP_1_ID, JMetricName.PERF_SUCCESS_RATE_OK, RefValue.of(1.0))
@@ -135,7 +131,7 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                         .build();
 
         return JLoadTest.builder(Id.of("lt_user_scenario"), jTestDefinition, jLoadProfileInvocations, jTerminationCriteria)
-                        .withLimits(avgLatencyLimit, stdDevLatencyLimit, minDevLatencyLimit, maxLatencyLimit, percentile99LatencyLimit, successRateLimit, errorsLimit)
+                        .withLimits(avgLatencyLimit, minDevLatencyLimit, maxLatencyLimit, percentile99LatencyLimit, successRateLimit, errorsLimit)
                         .build();
     }
 
@@ -145,7 +141,7 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                 .build();
 
         JLimit latencyPercentile42Limit = JLimitVsRefValue.builder(JMetricName.PERF_LATENCY_PERCENTILE(42D), RefValue.of(0.35D))
-                .withExactLimits(LowErrThresh.of(0.8), LowWarnThresh.of(0.82), UpWarnThresh.of(1.18), UpErrThresh.of(1.2))
+                .withOnlyErrors(LowErrThresh.of(0.8), UpErrThresh.of(1.2))
                 .build();
 
         JLimit latencyPercentile95Limit = JLimitVsRefValue.builder(JMetricName.PERF_LATENCY_PERCENTILE(95D), RefValue.of(0.99D))
@@ -156,16 +152,8 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
                 .withExactLimits(LowErrThresh.of(0.90), LowWarnThresh.of(0.92), UpWarnThresh.of(1.08), UpErrThresh.of(1.10))
                 .build();
 
-        JLimit stdDevLatencyLimit = JLimitVsRefValue.builder(JMetricName.PERF_STD_DEV_LATENCY, RefValue.of(0.4))
-                .withOnlyWarnings(LowWarnThresh.of(0.8), UpWarnThresh.of(1.2))
-                .build();
-
-        JLimit virtUsersLimit = JLimitVsRefValue.builder(JMetricName.PERF_VIRTUAL_USERS, RefValue.of(5.0D))
-                .withExactLimits(LowErrThresh.of(0.25), LowWarnThresh.of(0.50), UpWarnThresh.of(1.50), UpErrThresh.of(1.75))
-                .build();
-
         JLimit successRateLimit = JLimitVsRefValue.builder(JMetricName.PERF_SUCCESS_RATE_OK, RefValue.of(1D))
-                .withOnlyWarnings(LowWarnThresh.of(0.99), UpWarnThresh.of(1.01))
+                .withOnlyErrors(LowErrThresh.of(0.99), UpErrThresh.of(1.01))
                 .build();
 
         JLimit errorsLimit = JLimitVsRefValue.builder(JMetricName.PERF_SUCCESS_RATE_FAILS, RefValue.of(0.0))
@@ -177,12 +165,9 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
         limits.add(latencyPercentile42Limit);
         limits.add(latencyPercentile95Limit);
         limits.add(avgLatencyLimit);
-        limits.add(stdDevLatencyLimit);
-        limits.add(virtUsersLimit);
         limits.add(successRateLimit);
         limits.add(errorsLimit);
 
         return limits;
     }
-
 }
