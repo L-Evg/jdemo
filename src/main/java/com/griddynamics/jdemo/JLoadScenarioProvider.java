@@ -1,7 +1,5 @@
 package com.griddynamics.jdemo;
 
-import com.griddynamics.jagger.user.test.configurations.termination.JTerminationCriteriaBackground;
-import com.griddynamics.util.JaggerPropertiesProvider;
 import com.griddynamics.jagger.engine.e1.collector.loadscenario.ExampleLoadScenarioListener;
 import com.griddynamics.jagger.engine.e1.collector.testgroup.ExampleTestGroupListener;
 import com.griddynamics.jagger.invoker.scenario.JHttpUserScenarioInvocationListener;
@@ -13,10 +11,7 @@ import com.griddynamics.jagger.user.test.configurations.JTestDefinition;
 import com.griddynamics.jagger.user.test.configurations.auxiliary.Id;
 import com.griddynamics.jagger.user.test.configurations.limits.JLimit;
 import com.griddynamics.jagger.user.test.configurations.limits.JLimitVsRefValue;
-import com.griddynamics.jagger.user.test.configurations.limits.auxiliary.JMetricName;
-import com.griddynamics.jagger.user.test.configurations.limits.auxiliary.LowErrThresh;
-import com.griddynamics.jagger.user.test.configurations.limits.auxiliary.RefValue;
-import com.griddynamics.jagger.user.test.configurations.limits.auxiliary.UpErrThresh;
+import com.griddynamics.jagger.user.test.configurations.limits.auxiliary.*;
 import com.griddynamics.jagger.user.test.configurations.load.JLoadProfile;
 import com.griddynamics.jagger.user.test.configurations.load.JLoadProfileInvocation;
 import com.griddynamics.jagger.user.test.configurations.load.JLoadProfileRps;
@@ -25,17 +20,21 @@ import com.griddynamics.jagger.user.test.configurations.load.auxiliary.RequestsP
 import com.griddynamics.jagger.user.test.configurations.load.auxiliary.ThreadCount;
 import com.griddynamics.jagger.user.test.configurations.loadbalancer.JLoadBalancer;
 import com.griddynamics.jagger.user.test.configurations.termination.JTerminationCriteria;
+import com.griddynamics.jagger.user.test.configurations.termination.JTerminationCriteriaBackground;
 import com.griddynamics.jagger.user.test.configurations.termination.JTerminationCriteriaIterations;
 import com.griddynamics.jagger.user.test.configurations.termination.auxiliary.IterationsNumber;
 import com.griddynamics.jagger.user.test.configurations.termination.auxiliary.MaxDurationInSeconds;
 import com.griddynamics.jagger.util.StandardMetricsNamesUtil;
+import com.griddynamics.util.JaggerPropertiesProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import static com.griddynamics.jdemo.UserScenarioProvider.*;
 import static com.griddynamics.jagger.user.test.configurations.loadbalancer.JLoadBalancer.DefaultLoadBalancer.ROUND_ROBIN;
+import static com.griddynamics.jdemo.UserScenarioProvider.*;
 
 /**
  * By extending {@link JaggerPropertiesProvider} you get access to all Jagger properties and test properties. You can use them for configuration of JLoadScenario.<p>
@@ -75,7 +74,9 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
 
         JTerminationCriteria jTerminationCriteria = JTerminationCriteriaBackground.getInstance();
 
-        return  JLoadTest.builder(Id.of("lt_simple"), jTestDefinition, jLoadProfileRps, jTerminationCriteria).build();
+        return  JLoadTest.builder(Id.of("lt_simple"), jTestDefinition, jLoadProfileRps, jTerminationCriteria)
+                .withLimits(buildLimitsForSimpleTest())
+                .build();
     }
 
     private JLoadTest buildUserScenarioLoadTest() {
@@ -136,6 +137,52 @@ public class JLoadScenarioProvider extends JaggerPropertiesProvider {
         return JLoadTest.builder(Id.of("lt_user_scenario"), jTestDefinition, jLoadProfileInvocations, jTerminationCriteria)
                         .withLimits(avgLatencyLimit, stdDevLatencyLimit, minDevLatencyLimit, maxLatencyLimit, percentile99LatencyLimit, successRateLimit, errorsLimit)
                         .build();
+    }
+
+    private List<JLimit> buildLimitsForSimpleTest(){
+        JLimit throughputLimit = JLimitVsRefValue.builder(JMetricName.PERF_THROUGHPUT, RefValue.of(10.0D))
+                .withOnlyErrors(LowErrThresh.of(0.90), UpErrThresh.of(1.1))
+                .build();
+
+        JLimit latencyPercentile42Limit = JLimitVsRefValue.builder(JMetricName.PERF_LATENCY_PERCENTILE(42D), RefValue.of(0.35D))
+                .withExactLimits(LowErrThresh.of(0.8), LowWarnThresh.of(0.82), UpWarnThresh.of(1.18), UpErrThresh.of(1.2))
+                .build();
+
+        JLimit latencyPercentile95Limit = JLimitVsRefValue.builder(JMetricName.PERF_LATENCY_PERCENTILE(95D), RefValue.of(0.99D))
+                .withExactLimits(LowErrThresh.of(0.90), LowWarnThresh.of(0.91), UpWarnThresh.of(1.09), UpErrThresh.of(1.1))
+                .build();
+
+        JLimit avgLatencyLimit = JLimitVsRefValue.builder(JMetricName.PERF_AVG_LATENCY, RefValue.of(1.1))
+                .withExactLimits(LowErrThresh.of(0.90), LowWarnThresh.of(0.92), UpWarnThresh.of(1.08), UpErrThresh.of(1.10))
+                .build();
+
+        JLimit stdDevLatencyLimit = JLimitVsRefValue.builder(JMetricName.PERF_STD_DEV_LATENCY, RefValue.of(0.4))
+                .withOnlyWarnings(LowWarnThresh.of(0.8), UpWarnThresh.of(1.2))
+                .build();
+
+        JLimit virtUsersLimit = JLimitVsRefValue.builder(JMetricName.PERF_VIRTUAL_USERS, RefValue.of(5.0D))
+                .withExactLimits(LowErrThresh.of(0.25), LowWarnThresh.of(0.50), UpWarnThresh.of(1.50), UpErrThresh.of(1.75))
+                .build();
+
+        JLimit successRateLimit = JLimitVsRefValue.builder(JMetricName.PERF_SUCCESS_RATE_OK, RefValue.of(1D))
+                .withOnlyWarnings(LowWarnThresh.of(0.99), UpWarnThresh.of(1.01))
+                .build();
+
+        JLimit errorsLimit = JLimitVsRefValue.builder(JMetricName.PERF_SUCCESS_RATE_FAILS, RefValue.of(0.0))
+                        .withOnlyErrors(LowErrThresh.of(0.99), UpErrThresh.of(1.01))
+                        .build();
+
+        List<JLimit> limits = new ArrayList<>();
+        limits.add(throughputLimit);
+        limits.add(latencyPercentile42Limit);
+        limits.add(latencyPercentile95Limit);
+        limits.add(avgLatencyLimit);
+        limits.add(stdDevLatencyLimit);
+        limits.add(virtUsersLimit);
+        limits.add(successRateLimit);
+        limits.add(errorsLimit);
+
+        return limits;
     }
 
 }

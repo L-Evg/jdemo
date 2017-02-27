@@ -40,14 +40,14 @@ public class UserScenarioProvider implements Iterable {
                 .addStep(JHttpUserScenarioStep.builder(STEP_1_ID)
                         .withDisplayName("JaaS-1. GET environments.")
                         .withQuery(new JHttpQuery().get().path("/jaas/envs"))
-                        .withWaitAfterExecutionInSeconds(3)
+                        .withWaitAfterExecutionInSeconds(1)
                         .build())
                 .addStep(JHttpUserScenarioStep.builder(STEP_2_ID)
                         .withDisplayName("JaaS-1. GET executions.")
                         .withQuery(new JHttpQuery<TestExecutionEntity>().get()
                                 .path(pathExecutions + (provider.getExtraLoadFlag() ? "fakeSubPath" : ""))
                                 .body(new TestExecutionEntity() {{setEnvId("1"); setLoadScenarioId("1"); setTestProjectURL("http://usr-scenario-odin");}}))
-                        .withWaitAfterExecutionInSeconds(new Random().nextInt(5))
+                        .withWaitAfterExecutionInSeconds(1)
                         .withPostProcessFunction(response -> {
                             if (response.getStatus().is2xxSuccessful()) {
                                 log.info("JaaS-1. Step 2. Successfully got list of executions.");
@@ -61,7 +61,7 @@ public class UserScenarioProvider implements Iterable {
                         .withQuery(new JHttpQuery<TestExecutionEntity>().post()
                                 .path(pathExecutions)
                                 .body(new TestExecutionEntity() {{setEnvId("2"); setLoadScenarioId("2"); setTestProjectURL("http://usr-scenario-odin");}}))
-                        .withWaitAfterExecutionInSeconds(new Random().nextInt(5))
+                        .withWaitAfterExecutionInSeconds(1)
                         .build());
 
         userScenarios.add(userScenario);
